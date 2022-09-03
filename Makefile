@@ -22,6 +22,9 @@ VENDOR=bits-and-blooms
 # Project name
 PROJECT=bloom
 
+# Conda env name
+CONDA_ENV_NAME=bloom
+
 # Project version
 VERSION=$(shell cat VERSION)
 
@@ -42,6 +45,8 @@ ifeq ($(GOPATH),)
 	# extract the GOPATH
 	GOPATH=$(firstword $(subst /src/, ,$(CURRENTDIR)))
 endif
+
+CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activate ; conda activate
 
 # --- MAKE TARGETS ---
 
@@ -193,5 +198,25 @@ clean:
 
 # Deletes any intermediate file
 nuke:
-	rm -rf ./target
+	rm -rf target dist build python/shaped_bloom_filter.egg-info __pycache__
 	GOPATH=$(GOPATH) go clean -i ./...
+
+# Install the conda environment
+python-environment:
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) || conda create -n $(CONDA_ENV_NAME) -c conda-forge python=3.9 -y
+	pip install setuptools setuptools-golang wheel pytest
+
+# Build and install shaped-bloom-filter
+python-build:
+	rm -rf dist build python/shaped_bloom_filter.egg-info
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME)
+	python setup.py build_ext sdist bdist
+
+python-install:
+	rm -rf dist build python/shaped_bloom_filter.egg-info
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME)
+	pip install --force-reinstall -e .
+
+python-tests:
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME)
+	pytest -v -s python/tests/*.py

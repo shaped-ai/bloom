@@ -106,6 +106,15 @@ func FromWithM(data []uint64, m, k uint) *BloomFilter {
 	return &BloomFilter{m, k, bitset.From(data)}
 }
 
+func FromWithMAndBytes(data []byte, m, k uint) (*BloomFilter, error) {
+	array := bitset.BitSet{}
+	err := array.UnmarshalBinary(data)
+	if err != nil {
+		return nil, err
+	}
+	return &BloomFilter{m, k, &array}, nil
+}
+
 // baseHashes returns the four hash values of data that are used to create k
 // hashes
 func baseHashes(data []byte) [4]uint64 {
