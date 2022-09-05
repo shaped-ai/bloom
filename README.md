@@ -9,6 +9,8 @@ This implementation of the Bloom filter is ported from the https://github.com/bi
 [![Go Report Card](https://goreportcard.com/badge/github.com/bits-and-blooms/bloom)](https://goreportcard.com/report/github.com/bits-and-blooms/bloom)
 [![Go Reference](https://pkg.go.dev/badge/github.com/bits-and-blooms/bloom.svg)](https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3)) project. The reason for porting this project from Go is due to the fact that there are no high-performance implementations of the Bloom filter in Python. All Bloom filter packages we found on PyPi are written in pure Python and are just too slow for our real-time inference pipeline. We measured this implementation to be 60x faster than what we have gotten with the other libraries.
 
+The Godoc documentation of the ported library can be found here: https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3 
+
 ## Description
 
 A Bloom filter is a concise/compressed representation of a set, where the main
@@ -26,14 +28,42 @@ rate of 1% in the following manner.
 
 ```python
 from shaped_bloom_filter import BloomFilter
-filter := BloomFilter(1000000, 0.01) 
+filter = BloomFilter(1000000, 0.01)
 ```
 
-You should call the `BloomFilter` constructor conservatively: if you specify a number of elements that it is
+Operations like the following can be done:
+
+```python
+# single member addition
+assert filter.is_member(10) == False
+filter.add(10)
+assert filter.is_member(10) == True
+
+# multiple member addition
+assert filter.are_members([1, 5, 9]) == [0, 0, 0]
+filter.add_batch([5, 9])
+assert filter.are_members([1, 5, 9]) == [0, 1, 1]
+
+# serialization
+serialized = filter.serialize()
+new_filter = BloomFilter(restore_from_serialized=serialized)
+assert new_filter.are_members([1, 5, 9]) == [0, 1, 1]
+```
+
+For composing your own keys, you can use the following method:
+
+```python
+from shaped_bloom_filter import BloomFilterExtended
+filter = BloomFilterExtended(1000000, 0.01)
+
+assert filter.is_one_member("Emma is writing a letter.".encode("utf-8")) == False
+filter.add_one_member("Emma is writing a letter.".encode("utf-8"))
+assert filter.is_one_member("Emma is writing a letter.".encode("utf-8")) == True
+```
+
+You should call the `BloomFilter`/`BloomFilterExtended` constructors conservatively: if you specify a number of elements that it is
 too small, the false-positive bound might be exceeded. A Bloom filter is not a dynamic data structure:
 you must know ahead of time what your desired capacity is.
-
-Godoc documentation:  https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3 
 
 ## Installation
 
