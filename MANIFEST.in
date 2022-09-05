@@ -1,0 +1,4 @@
+include LICENSE
+include go.mod
+include go.sum
+include *.go

@@ -1,15 +1,27 @@
+import os
 from setuptools import setup, find_namespace_packages, Extension
+
+with open("README.md") as f:
+    long_description = f.read()
+
+version = "3.3.0"
+circleci_build_number = os.getenv("CIRCLE_BUILD_NUM", "")
+if circleci_build_number != "":
+    version = f"{version}.dev{circleci_build_number}"
 
 setup(
     name="shaped-bloom-filter",
-    version="3.3.0",
+    version=version,
     author="Shaped Team",
     author_email="support@shaped.ai",
     url="https://github.com/shaped-ai/bloom",
-    description="Python-importable bloom filter within bindings in Go.",
+    description="Highly optimized bloom filter in Python with bindings in Go.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     keywords=["bloom-filter", "shaped-ai"],
     classifiers=[
         "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS :: MacOS X",
         "Programming Language :: Python :: 3",
     ],
     packages=find_namespace_packages(where="python"),
@@ -25,4 +37,5 @@ setup(
         )
     ],
     package_data={"shaped_bloom_filter.golib": ["*.h"]},
+    include_package_data=True,
 )
