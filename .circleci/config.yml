@@ -20,7 +20,66 @@ jobs:
             make python-install
             make python-tests
 
+  test-build-and-upload-library:
+    resource_class: small
+    docker:
+      - image: cimg/go:1.19
+    parallelism: 1
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+        name: Building, testing and uploading x86_64 packages
+        command: |
+          DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
+          docker image pull $DOCKER_IMAGE
+          docker run --rm -v $(pwd):/io \
+            -e TWINE_REGISTRY_URL=https://test.pypi.org/legacy/ \
+            -e TWINE_USERNAME=$TWINE_USERNAME_TEST \
+            -e TWINE_PASSWORD=$TWINE_PASSWORD_TEST \
+            $DOCKER_IMAGE /io/.circleci/build-wheels.sh
+  
+  prod-build-and-upload-library:
+    resource_class: small
+    docker:
+      - image: cimg/go:1.19
+    parallelism: 1
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+        name: Building, testing and uploading x86_64 packages
+        command: |
+          DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
+          docker image pull $DOCKER_IMAGE
+          docker run --rm -v $(pwd):/io \
+            -e TWINE_REGISTRY_URL=https://upload.pypi.org/legacy/ \
+            -e TWINE_USERNAME=$TWINE_USERNAME_PROD \
+            -e TWINE_PASSWORD=$TWINE_PASSWORD_PROD \
+            $DOCKER_IMAGE /io/.circleci/build-wheels.sh
+
 workflows:
   main:
     jobs:
       - test-python-bloom-bindings
+      - build-and-deploy-approval:
+          type: approval
+          filters:
+            branches:
+              only:
+                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      - test-build-and-upload-library:
+          requires:
+            - test-python-bloom-bindings
+          filters:
+            branches:
+              only:
+                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      - prod-build-and-upload-library:
+          requires:
+            - test-build-and-upload-library
+            - build-and-deploy-approval
+          filters:
+            branches:
+              only:
+                - /^v[0-9]+\.[0-9]+\.[0-9]+$/

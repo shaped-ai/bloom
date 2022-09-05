@@ -208,11 +208,11 @@ python-environment:
 
 # Build and install shaped-bloom-filter
 python-build:
-	rm -rf dist build python/shaped_bloom_filter.egg-info python/shaped_bloom_filter/libbloomf*.so
+	rm -rf dist build target wheelhouse python/shaped_bloom_filter.egg-info python/shaped_bloom_filter/libbloomf*.so
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && GOPATH= python setup.py build_ext sdist bdist
 
 python-install:
-	rm -rf dist build python/shaped_bloom_filter.egg-info python/shaped_bloom_filter/libbloomf*.so
+	rm -rf dist build target wheelhouse python/shaped_bloom_filter.egg-info python/shaped_bloom_filter/libbloomf*.so
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && GOPATH= pip install --force-reinstall -e .
 
 python-tests:

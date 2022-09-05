@@ -10,7 +10,7 @@ setup(
     keywords=["bloom-filter", "shaped-ai"],
     classifiers=[
         "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3",
     ],
     packages=find_namespace_packages(where="python"),
     package_dir={"": "python"},
