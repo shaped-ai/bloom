@@ -64,24 +64,24 @@ workflows:
   main:
     jobs:
       - test-python-bloom-bindings
-      - build-and-deploy-approval:
-          type: approval
-          filters:
-            branches:
-              only:
-                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
-      - test-build-and-upload-library:
-          requires:
-            - test-python-bloom-bindings
-          filters:
-            branches:
-              only:
-                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
-      - prod-build-and-upload-library:
-          requires:
-            - test-build-and-upload-library
-            - build-and-deploy-approval
-          filters:
-            branches:
-              only:
-                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      # - build-and-deploy-approval:
+      #     type: approval
+      #     filters:
+      #       branches:
+      #         only:
+      #           - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      # - test-build-and-upload-library:
+      #     requires:
+      #       - test-python-bloom-bindings
+      #     filters:
+      #       branches:
+      #         only:
+      #           - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      # - prod-build-and-upload-library:
+      #     requires:
+      #       - test-build-and-upload-library
+      #       - build-and-deploy-approval
+      #     filters:
+      #       branches:
+      #         only:
+      #           - /^v[0-9]+\.[0-9]+\.[0-9]+$/
