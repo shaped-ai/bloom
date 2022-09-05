@@ -29,16 +29,16 @@ jobs:
       - setup_remote_docker
       - checkout
       - run:
-        name: Building, testing and uploading x86_64 packages
-        command: |
-          export DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
-          docker image pull $DOCKER_IMAGE
-          docker run --rm -v $(pwd):/io \
-            -e TWINE_REGISTRY_URL=https://test.pypi.org/legacy/ \
-            -e TWINE_USERNAME=$TWINE_USERNAME_TEST \
-            -e TWINE_PASSWORD=$TWINE_PASSWORD_TEST \
-            -e CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
-            $DOCKER_IMAGE /io/.circleci/build-wheels.sh
+          name: Building, testing and uploading x86_64 packages
+          command: |
+            export DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
+            docker image pull $DOCKER_IMAGE
+            docker run --rm -v $(pwd):/io \
+              -e TWINE_REGISTRY_URL=https://test.pypi.org/legacy/ \
+              -e TWINE_USERNAME=$TWINE_USERNAME_TEST \
+              -e TWINE_PASSWORD=$TWINE_PASSWORD_TEST \
+              -e CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+              $DOCKER_IMAGE /io/.circleci/build-wheels.sh
   
   prod-build-and-upload-library:
     resource_class: small
@@ -49,39 +49,39 @@ jobs:
       - setup_remote_docker
       - checkout
       - run:
-        name: Building, testing and uploading x86_64 packages
-        command: |
-          export DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
-          docker image pull $DOCKER_IMAGE
-          docker run --rm -v $(pwd):/io \
-            -e TWINE_REGISTRY_URL=https://upload.pypi.org/legacy/ \
-            -e TWINE_USERNAME=$TWINE_USERNAME_PROD \
-            -e TWINE_PASSWORD=$TWINE_PASSWORD_PROD \
-            -e CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
-            $DOCKER_IMAGE /io/.circleci/build-wheels.sh
+          name: Building, testing and uploading x86_64 packages
+          command: |
+            export DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
+            docker image pull $DOCKER_IMAGE
+            docker run --rm -v $(pwd):/io \
+              -e TWINE_REGISTRY_URL=https://upload.pypi.org/legacy/ \
+              -e TWINE_USERNAME=$TWINE_USERNAME_PROD \
+              -e TWINE_PASSWORD=$TWINE_PASSWORD_PROD \
+              -e CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+              $DOCKER_IMAGE /io/.circleci/build-wheels.sh
 
 workflows:
   main:
     jobs:
       - test-python-bloom-bindings
-      # - build-and-deploy-approval:
-      #     type: approval
-      #     filters:
-      #       branches:
-      #         only:
-      #           - /^v[0-9]+\.[0-9]+\.[0-9]+$/
-      # - test-build-and-upload-library:
-      #     requires:
-      #       - test-python-bloom-bindings
-      #     filters:
-      #       branches:
-      #         only:
-      #           - /^v[0-9]+\.[0-9]+\.[0-9]+$/
-      # - prod-build-and-upload-library:
-      #     requires:
-      #       - test-build-and-upload-library
-      #       - build-and-deploy-approval
-      #     filters:
-      #       branches:
-      #         only:
-      #           - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      - build-and-deploy-approval:
+          type: approval
+          filters:
+            branches:
+              only:
+                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      - test-build-and-upload-library:
+          requires:
+            - test-python-bloom-bindings
+          filters:
+            branches:
+              only:
+                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      - prod-build-and-upload-library:
+          requires:
+            - test-build-and-upload-library
+            - build-and-deploy-approval
+          filters:
+            branches:
+              only:
+                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
