@@ -33,7 +33,7 @@ for PYBIN in /opt/python/cp3*/bin/; do
     (cd "$PYHOME"; "${PYBIN}/pytest" -v -s /io/python/tests/*.py)
 done
 
-#  Upload
+# Upload wheels
 for WHEEL in /io/wheelhouse/shaped_bloom_filter*; do
     /opt/python/cp37-cp37m/bin/twine upload \
         --skip-existing \
@@ -41,3 +41,9 @@ for WHEEL in /io/wheelhouse/shaped_bloom_filter*; do
         -u "${TWINE_USERNAME}" -p "${TWINE_PASSWORD}" \
         "${WHEEL}"
 done
+# Upload archive
+/opt/python/cp37-cp37m/bin/twine upload \
+    --skip-existing \
+    --repository-url "${TWINE_REGISTRY_URL}" \
+    -u "${TWINE_USERNAME}" -p "${TWINE_PASSWORD}" \
+    /io/wheelhouse/shaped-bloom-filter-*.tar.gz
