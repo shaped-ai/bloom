@@ -62,9 +62,15 @@ class BloomFilter:
             )
 
     def add(self, var: int):
+        """
+        Add a single 32-bit integer key to the filter.
+        """
         self.add_batch([var])
 
     def add_batch(self, var: List[int]):
+        """
+        Add a list of 32-bit integer keys to the filter.
+        """
         data = self._ffi.new("GoUint[]", var)
         length = len(data)
 
@@ -80,9 +86,16 @@ class BloomFilter:
         self._libbloomf.AddListUint(self._filter, go_slice[0])
 
     def is_member(self, var: int) -> bool:
+        """
+        Check if a given 32-bit integer key has been set.
+        """
         return self.are_members([var])[0]
 
     def are_members(self, var: List[int]) -> List[bool]:
+        """
+        Check if a given list of 32-bit integer keys have been set.
+        A boolean list is returned.
+        """
         data = self._ffi.new("GoUint[]", var)
         length = len(var)
 
@@ -102,7 +115,11 @@ class BloomFilter:
             self._libbloomf.free(self._ffi.cast("void*", out))
         return unpacked
 
-    def serialize(self):
+    def serialize(self) -> bytes:
+        """
+        Serialize the filter for storing purposes.
+        To restore it, pass the returned bytes into the constructor's restore_from_serialized parameter.
+        """
         serializable = {
             "m": self._filter.m,
             "k": self._filter.k,
@@ -143,6 +160,10 @@ class BloomFilterExtended(BloomFilter):
         return data, length
 
     def add_one_member(self, var: Union[List[int], int, bytes]):
+        """
+        Add a single key to the filter.
+        Examples of keys: serialized Python objects, strings, 64-digit integers, etc.
+        """
         data, length = self._check_input_type(var)
         go_slice = self._ffi.new(
             "GoSlice*",
@@ -155,6 +176,10 @@ class BloomFilterExtended(BloomFilter):
         self._libbloomf.Add(self._filter, go_slice[0])
 
     def is_one_member(self, var: Union[List[int], int, bytes]) -> bool:
+        """
+        Check if a single key has been set.
+        Examples of keys: serialized Python objects, strings, 64-digit integers, etc.
+        """
         data, length = self._check_input_type(var)
         go_slice = self._ffi.new(
             "GoSlice*",
