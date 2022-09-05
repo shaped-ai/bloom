@@ -66,6 +66,8 @@ workflows:
       - test-python-bloom-bindings
       - build-and-deploy-approval:
           type: approval
+          requires:
+            - test-build-and-upload-library
           filters:
             branches:
               only:
