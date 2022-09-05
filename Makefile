@@ -204,19 +204,16 @@ nuke:
 # Install the conda environment
 python-environment:
 	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) || conda create -n $(CONDA_ENV_NAME) -c conda-forge python=3.9 -y
-	pip install setuptools setuptools-golang wheel pytest
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && pip install setuptools setuptools-golang wheel pytest
 
 # Build and install shaped-bloom-filter
 python-build:
-	rm -rf dist build python/shaped_bloom_filter.egg-info
-	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME)
-	python setup.py build_ext sdist bdist
+	rm -rf dist build python/shaped_bloom_filter.egg-info python/shaped_bloom_filter/libbloomf*.so
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && python setup.py build_ext sdist bdist
 
 python-install:
-	rm -rf dist build python/shaped_bloom_filter.egg-info
-	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME)
-	pip install --force-reinstall -e .
+	rm -rf dist build python/shaped_bloom_filter.egg-info python/shaped_bloom_filter/libbloomf*.so
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && pip install --force-reinstall -e .
 
 python-tests:
-	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME)
-	pytest -v -s python/tests/*.py
+	$(CONDA_ACTIVATE) $(CONDA_ENV_NAME) && pytest -v -s python/tests/*.py
