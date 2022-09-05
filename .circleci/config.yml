@@ -31,12 +31,13 @@ jobs:
       - run:
         name: Building, testing and uploading x86_64 packages
         command: |
-          DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
+          export DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
           docker image pull $DOCKER_IMAGE
           docker run --rm -v $(pwd):/io \
             -e TWINE_REGISTRY_URL=https://test.pypi.org/legacy/ \
             -e TWINE_USERNAME=$TWINE_USERNAME_TEST \
             -e TWINE_PASSWORD=$TWINE_PASSWORD_TEST \
+            -e CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
             $DOCKER_IMAGE /io/.circleci/build-wheels.sh
   
   prod-build-and-upload-library:
@@ -50,12 +51,13 @@ jobs:
       - run:
         name: Building, testing and uploading x86_64 packages
         command: |
-          DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
+          export DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
           docker image pull $DOCKER_IMAGE
           docker run --rm -v $(pwd):/io \
             -e TWINE_REGISTRY_URL=https://upload.pypi.org/legacy/ \
             -e TWINE_USERNAME=$TWINE_USERNAME_PROD \
             -e TWINE_PASSWORD=$TWINE_PASSWORD_PROD \
+            -e CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
             $DOCKER_IMAGE /io/.circleci/build-wheels.sh
 
 workflows:
