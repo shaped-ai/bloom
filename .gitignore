@@ -25,6 +25,9 @@ _testmain.go
 
 target
 .idea
+
+# Python artifacts
 python/shaped_bloom_filter.egg-info
 build
+dist
 __pycache__
