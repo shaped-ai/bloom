@@ -10,20 +10,22 @@ struct BloomFilter {
 	unsigned int b_length;
 	char *b;
 };
-
-// __attribute__((weak))
-// void freeMemory(void *ptr) {
-// 	free(ptr);
-// }
 */
 import "C"
 import (
 	"encoding/binary"
+	"fmt"
+	"os"
 	"unsafe"
 
 	"github.com/bits-and-blooms/bitset"
 	"github.com/bits-and-blooms/bloom/v3"
 )
+
+func printStacktraceAndExit(err error) {
+	fmt.Printf("%+v\n", err)
+	os.Exit(1)
+}
 
 func uint32ToBytes(number uint) []byte {
 	a := make([]byte, 4)
@@ -43,6 +45,22 @@ func deallocBloomFilter(p *C.struct_BloomFilter) {
 	p = nil
 }
 
+//export NewFromSerialized
+func NewFromSerialized(m uint, k uint, b_length uint, data []uint8) *C.struct_BloomFilter {
+	mC := C.uint(m)
+	kC := C.uint(k)
+	bLengthC := C.uint(b_length)
+	cArray := C.CBytes(data)
+
+	bfCPointer := mallocBloomFilter()
+	bfCPointer.m = mC
+	bfCPointer.k = kC
+	bfCPointer.b_length = bLengthC
+	bfCPointer.b = (*C.char)(cArray)
+
+	return bfCPointer
+}
+
 //export NewWithEstimates
 func NewWithEstimates(n uint, fp float64) *C.struct_BloomFilter {
 	bloomFilterGo := bloom.NewWithEstimates(n, fp)
@@ -52,7 +70,7 @@ func NewWithEstimates(n uint, fp float64) *C.struct_BloomFilter {
 
 	array, err := bloomFilterGo.BitSet().MarshalBinary()
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 
 	bLength := C.uint(uint(len(array)))
@@ -73,18 +91,18 @@ func Add(bloomFilterC *C.struct_BloomFilter, data []byte) {
 	myBitSetBytes := C.GoBytes(unsafe.Pointer(bloomFilterC.b), C.int(bloomFilterC.b_length))
 	err := array.UnmarshalBinary(myBitSetBytes)
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 
 	bloomFilterGo, err := bloom.FromWithMAndBytes(myBitSetBytes, uint(bloomFilterC.m), uint(bloomFilterC.k))
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 	bloomFilterGo.Add(data)
 
 	tmpArray, err := bloomFilterGo.BitSet().MarshalBinary()
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 	arrayC := C.CBytes(tmpArray)
 	bloomFilterC.b = (*C.char)(arrayC)
@@ -96,12 +114,12 @@ func AddListUint(bloomFilterC *C.struct_BloomFilter, data []uint) {
 	myBitSetBytes := C.GoBytes(unsafe.Pointer(bloomFilterC.b), C.int(bloomFilterC.b_length))
 	err := array.UnmarshalBinary(myBitSetBytes)
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 
 	bloomFilterGo, err := bloom.FromWithMAndBytes(myBitSetBytes, uint(bloomFilterC.m), uint(bloomFilterC.k))
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 
 	for i := range data {
@@ -111,7 +129,7 @@ func AddListUint(bloomFilterC *C.struct_BloomFilter, data []uint) {
 
 	tmpArray, err := bloomFilterGo.BitSet().MarshalBinary()
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 	cArray := C.CBytes(tmpArray)
 	bloomFilterC.b = (*C.char)(cArray)
@@ -123,12 +141,12 @@ func Test(bf_c *C.struct_BloomFilter, data []byte) bool {
 	myBitSetBytes := C.GoBytes(unsafe.Pointer(bf_c.b), C.int(bf_c.b_length))
 	err := array.UnmarshalBinary(myBitSetBytes)
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 
 	bloomFilterGo, err := bloom.FromWithMAndBytes(myBitSetBytes, uint(bf_c.m), uint(bf_c.k))
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 
 	return bloomFilterGo.Test(data)
@@ -140,12 +158,12 @@ func TestListUint(bf_c *C.struct_BloomFilter, data []uint) *C.char {
 	myBitSetBytes := C.GoBytes(unsafe.Pointer(bf_c.b), C.int(bf_c.b_length))
 	err := array.UnmarshalBinary(myBitSetBytes)
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 
 	bloomFilterGo, err := bloom.FromWithMAndBytes(myBitSetBytes, uint(bf_c.m), uint(bf_c.k))
 	if err != nil {
-		panic(err)
+		printStacktraceAndExit(err)
 	}
 
 	testResults := make([]byte, len(data))

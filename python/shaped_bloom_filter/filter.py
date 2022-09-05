@@ -24,16 +24,38 @@ class BloomFilter:
             self._filter = self._libbloomf.NewWithEstimates(max_elements, error_rate)
         elif restore_from_serialized is not None:
             deserialized = pickle.loads(restore_from_serialized)
-            backend_array = self._ffi.new("GoUint8[]", deserialized["b"])
-            self._filter = self._ffi.new(
-                "struct BloomFilter*",
+
+            m = deserialized["m"]
+            k = deserialized["k"]
+            b_length = deserialized["b_length"]
+            b = deserialized["b"]
+
+            data = self._ffi.new("GoUint8[]", list(b))
+            go_slice = self._ffi.new(
+                "GoSlice*",
                 {
-                    "m": deserialized["m"],
-                    "k": deserialized["k"],
-                    "b_length": deserialized["b_length"],
-                    "b": backend_array,
+                    "data": self._ffi.cast("void*", data),
+                    "len": b_length,
+                    "cap": b_length,
                 },
             )
+            self._filter = self._libbloomf.NewFromSerialized(
+                m, k, b_length, go_slice[0]
+            )
+
+            # # Create structure directly with ffi instead.
+            # # Leads to an "Aborted (core dumped)" error for some reason.
+            # backend_array = self._ffi.new("GoUint8[]", deserialized["b"])
+            # cast_array = self._ffi.cast("char*", backend_array)
+            # self._filter = self._ffi.new(
+            #     "struct BloomFilter*",
+            #     {
+            #         "m": deserialized["m"],
+            #         "k": deserialized["k"],
+            #         "b_length": deserialized["b_length"],
+            #         "b": cast_array,
+            #     },
+            # )
         else:
             raise BloomFilterIncorrectConstructorValues(
                 "either set max_elements and error_rate or set restore_from_serialized params"
@@ -89,8 +111,18 @@ class BloomFilter:
         }
         return pickle.dumps(serializable, protocol=pickle.HIGHEST_PROTOCOL)
 
+    def __del__(self):
+        if hasattr(self, "_filter"):
+            cast_p1 = self._ffi.cast("void*", self._filter.b)
+            cast_p2 = self._ffi.cast("void*", self._filter)
+            self._libbloomf.free(cast_p1)
+            self._libbloomf.free(cast_p2)
+
 
 class BloomFilterExtended(BloomFilter):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def _check_input_type(self, var: Union[List[int], int, bytes]):
         if isinstance(var, list):
             # Assuming the list is composed of integer elements.

@@ -83,13 +83,6 @@ def test_bloom_filter_serialized_members():
     assert new_bf.are_members(list(range(10))) == [0, 1, 0, 0, 0, 1, 1, 0, 0, 0]
 
 
-def test_bloom_filter_error():
-    bf = default_parametrized_bloom_filter(10000, 0.51)
-    members = list(range(100))
-    bf.add_batch(members)
-    bf.are_members(list(range(10000)))
-
-
 def test_bloom_filter_extended_add_one_member_bad_input():
     bf = default_parametrized_bloom_filter_extended()
     with pytest.raises(BloomFilterIncorrectInputException):
