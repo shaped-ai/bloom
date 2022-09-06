@@ -50,21 +50,11 @@ def test_bloom_filter_creation_serialized():
     assert serialized == new_serialized
 
 
-def test_bloom_filter_add():
-    bf = default_parametrized_bloom_filter()
-    bf.add(3)
-
-
 def test_bloom_filter_is_member():
     bf = default_parametrized_bloom_filter()
     assert bf.is_member(3) == False
     bf.add(3)
     assert bf.is_member(3) == True
-
-
-def test_bloom_filter_add_batch():
-    bf = default_parametrized_bloom_filter()
-    bf.add_batch([1, 5, 6])
 
 
 def test_bloom_filter_are_members():
@@ -95,11 +85,6 @@ def test_bloom_filter_extended_add_one_member_overflow_error():
         bf.add_one_member(256)
     with pytest.raises(OverflowError):
         bf.add_one_member([256])
-
-
-def test_bloom_filter_extended_add_one_member():
-    bf = default_parametrized_bloom_filter_extended()
-    bf.add_one_member([0, 5, 128])
 
 
 def test_bloom_filter_extended_is_one_member():

@@ -106,7 +106,7 @@ func FromWithM(data []uint64, m, k uint) *BloomFilter {
 	return &BloomFilter{m, k, bitset.From(data)}
 }
 
-func FromWithMAndBytes(data []byte, m, k uint) (*BloomFilter, error) {
+func FromRawParametersToBloomFilter(data []byte, m, k uint) (*BloomFilter, error) {
 	array := bitset.BitSet{}
 	err := array.UnmarshalBinary(data)
 	if err != nil {

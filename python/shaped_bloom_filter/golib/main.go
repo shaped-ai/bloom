@@ -94,7 +94,7 @@ func Add(bloomFilterC *C.struct_BloomFilter, data []byte) {
 		printStacktraceAndExit(err)
 	}
 
-	bloomFilterGo, err := bloom.FromWithMAndBytes(myBitSetBytes, uint(bloomFilterC.m), uint(bloomFilterC.k))
+	bloomFilterGo, err := bloom.FromRawParametersToBloomFilter(myBitSetBytes, uint(bloomFilterC.m), uint(bloomFilterC.k))
 	if err != nil {
 		printStacktraceAndExit(err)
 	}
@@ -117,7 +117,7 @@ func AddListUint(bloomFilterC *C.struct_BloomFilter, data []uint) {
 		printStacktraceAndExit(err)
 	}
 
-	bloomFilterGo, err := bloom.FromWithMAndBytes(myBitSetBytes, uint(bloomFilterC.m), uint(bloomFilterC.k))
+	bloomFilterGo, err := bloom.FromRawParametersToBloomFilter(myBitSetBytes, uint(bloomFilterC.m), uint(bloomFilterC.k))
 	if err != nil {
 		printStacktraceAndExit(err)
 	}
@@ -144,7 +144,7 @@ func Test(bf_c *C.struct_BloomFilter, data []byte) bool {
 		printStacktraceAndExit(err)
 	}
 
-	bloomFilterGo, err := bloom.FromWithMAndBytes(myBitSetBytes, uint(bf_c.m), uint(bf_c.k))
+	bloomFilterGo, err := bloom.FromRawParametersToBloomFilter(myBitSetBytes, uint(bf_c.m), uint(bf_c.k))
 	if err != nil {
 		printStacktraceAndExit(err)
 	}
@@ -161,7 +161,7 @@ func TestListUint(bf_c *C.struct_BloomFilter, data []uint) *C.char {
 		printStacktraceAndExit(err)
 	}
 
-	bloomFilterGo, err := bloom.FromWithMAndBytes(myBitSetBytes, uint(bf_c.m), uint(bf_c.k))
+	bloomFilterGo, err := bloom.FromRawParametersToBloomFilter(myBitSetBytes, uint(bf_c.m), uint(bf_c.k))
 	if err != nil {
 		printStacktraceAndExit(err)
 	}

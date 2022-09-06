@@ -13,7 +13,7 @@ class BloomFilter:
         self,
         max_elements: Optional[int] = None,
         error_rate: Optional[float] = None,
-        restore_from_serialized: bytes = None,
+        restore_from_serialized: Optional[bytes] = None,
     ):
         self._ffi, self._libbloomf = load_bloom_filter_dll()
         if max_elements and error_rate and restore_from_serialized:
@@ -42,20 +42,6 @@ class BloomFilter:
             self._filter = self._libbloomf.NewFromSerialized(
                 m, k, b_length, go_slice[0]
             )
-
-            # # Create structure directly with ffi instead.
-            # # Leads to an "Aborted (core dumped)" error for some reason.
-            # backend_array = self._ffi.new("GoUint8[]", deserialized["b"])
-            # cast_array = self._ffi.cast("char*", backend_array)
-            # self._filter = self._ffi.new(
-            #     "struct BloomFilter*",
-            #     {
-            #         "m": deserialized["m"],
-            #         "k": deserialized["k"],
-            #         "b_length": deserialized["b_length"],
-            #         "b": cast_array,
-            #     },
-            # )
         else:
             raise BloomFilterIncorrectConstructorValues(
                 "either set max_elements and error_rate or set restore_from_serialized params"

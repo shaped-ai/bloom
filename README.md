@@ -50,7 +50,7 @@ new_filter = BloomFilter(restore_from_serialized=serialized)
 assert new_filter.are_members([1, 5, 9]) == [0, 1, 1]
 ```
 
-For composing your own keys, you can use the following method:
+For composing your own keys using Python-serializable objects, you can use the following method:
 
 ```python
 from shaped_bloom_filter import BloomFilterExtended
