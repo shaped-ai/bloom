@@ -3,7 +3,7 @@ jobs:
   test-go-bloom-filter:
     resource_class: small
     docker:
-      - image: cimg/go:1.19
+      - image: cimg/go:1.14
     parallelism: 1
     steps:
       - checkout
