@@ -1,7 +1,8 @@
-import os
 import glob
-import pkg_resources
+import os
+
 import cffi
+import pkg_resources
 
 
 def _find_libbloomf_dll_paths():

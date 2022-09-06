@@ -1,6 +1,6 @@
-import pytest
 import random
 
+import pytest
 from shaped_bloom_filter import BloomFilter, BloomFilterExtended
 from shaped_bloom_filter.exceptions import (
     BloomFilterIncorrectConstructorValues,

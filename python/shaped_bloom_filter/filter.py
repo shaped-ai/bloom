@@ -1,5 +1,5 @@
 import pickle
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 from shaped_bloom_filter.binding import load_bloom_filter_dll
 from shaped_bloom_filter.exceptions import (

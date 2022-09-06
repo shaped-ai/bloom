@@ -1,5 +1,6 @@
 import os
-from setuptools import setup, find_namespace_packages, Extension
+
+from setuptools import Extension, find_namespace_packages, setup
 
 with open("README.md") as f:
     long_description = f.read()
