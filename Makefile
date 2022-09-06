@@ -43,7 +43,8 @@ ifneq ($(GOPATH),)
 endif
 ifeq ($(GOPATH),)
 	# extract the GOPATH
-	GOPATH=$(firstword $(subst /src/, ,$(CURRENTDIR)))
+	# GOPATH=$(firstword $(subst /src/, ,$(CURRENTDIR)))
+	GOPATH=$($(CURRENTDIR)/src)
 endif
 
 CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activate ; conda activate
