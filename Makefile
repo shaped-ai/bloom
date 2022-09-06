@@ -43,8 +43,7 @@ ifneq ($(GOPATH),)
 endif
 ifeq ($(GOPATH),)
 	# extract the GOPATH
-	# GOPATH=$(firstword $(subst /src/, ,$(CURRENTDIR)))
-	GOPATH=$($(CURRENTDIR)/src)
+	GOPATH=$(firstword $(subst /src/, ,$(CURRENTDIR)))
 endif
 
 CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activate ; conda activate
@@ -187,7 +186,7 @@ qa: fmtcheck test vet lint coverage cyclo ineffassign misspell structcheck varch
 # Get the dependencies
 deps:
 	GOPATH=$(GOPATH) go get ./...
-	GOPATH=$(GOPATH) go get golang.org/x/lint
+	GOPATH=$(GOPATH) go get github.com/golang/lint/golint
 	GOPATH=$(GOPATH) go get github.com/jstemmer/go-junit-report
 	GOPATH=$(GOPATH) go get github.com/axw/gocov/gocov
 	GOPATH=$(GOPATH) go get github.com/fzipp/gocyclo

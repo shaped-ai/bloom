@@ -10,9 +10,7 @@ jobs:
       - run:
           name: Running tests
           command: |
-            make format
-            make deps
-            make qa
+            go test -v ./...
 
   linting-python-bloom-bindings:
     resource_class: small
