@@ -1,5 +1,23 @@
 version: 2.1
 jobs:
+  linting:
+    resource_class: small
+    docker:
+      - image: cimg/base:stable
+    parallelism: 1
+    steps:
+      - checkout
+      - run:
+          name: Linting
+          command: |
+            curl "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh" --output miniconda.sh
+            bash miniconda.sh -b -p .venv
+            rm miniconda.sh
+            source .venv/etc/profile.d/conda.sh
+
+            make python-environment
+            make python-lint-check
+
   test-python-bloom-bindings:
     resource_class: small
     docker:
@@ -63,6 +81,7 @@ jobs:
 workflows:
   main:
     jobs:
+      - linting
       - test-python-bloom-bindings
       - build-and-deploy-approval:
           type: approval
