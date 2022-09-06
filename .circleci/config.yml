@@ -1,5 +1,19 @@
 version: 2.1
 jobs:
+  test-go-bloom-filter:
+    resource_class: small
+    docker:
+      - image: cimg/go:1.19
+    parallelism: 1
+    steps:
+      - checkout
+      - run:
+          name: Running tests
+          command: |
+            make format
+            make deps
+            make qa
+
   linting-python-bloom-bindings:
     resource_class: small
     docker:
@@ -81,6 +95,7 @@ jobs:
 workflows:
   main:
     jobs:
+      - test-go-bloom-filter
       - linting-python-bloom-bindings
       - test-python-bloom-bindings
       - build-and-deploy-approval:
@@ -93,6 +108,8 @@ workflows:
                 - /^v[0-9]+\.[0-9]+\.[0-9]+$/
       - test-build-and-upload-library:
           requires:
+            - test-go-bloom-filter
+            - linting-python-bloom-bindings
             - test-python-bloom-bindings
           filters:
             branches:
