@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  linting:
+  linting-python-bloom-bindings:
     resource_class: small
     docker:
       - image: cimg/base:stable
@@ -81,7 +81,7 @@ jobs:
 workflows:
   main:
     jobs:
-      - linting
+      - linting-python-bloom-bindings
       - test-python-bloom-bindings
       - build-and-deploy-approval:
           type: approval
