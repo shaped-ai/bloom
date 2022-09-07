@@ -176,6 +176,8 @@ func testEstimated(n uint, maxFp float64, t *testing.T) {
 	fpRate := EstimateFalsePositiveRate(m, k, n)
 	if fpRate > 1.5*maxFp {
 		t.Errorf("False positive rate too high: n: %v; m: %v; k: %v; maxFp: %f; fpRate: %f, fpRate/maxFp: %f", n, m, k, maxFp, fpRate, fpRate/maxFp)
+	} else {
+		t.Logf("Accepted positive rate: maxFp: %f; fpRate: %f, fpRate/maxFp: %f", maxFp, fpRate, fpRate/maxFp)
 	}
 }
 
