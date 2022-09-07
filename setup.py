@@ -24,6 +24,8 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Operating System :: MacOS :: MacOS X",
         "Programming Language :: Python :: 3",
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
     ],
     packages=find_namespace_packages(where="python"),
     package_dir={"": "python"},
