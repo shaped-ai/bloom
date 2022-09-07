@@ -114,6 +114,9 @@ class BloomFilter:
         }
         return pickle.dumps(serializable, protocol=pickle.HIGHEST_PROTOCOL)
 
+    def __contains__(self, var: int) -> bool:
+        return self.is_member(var)
+
     def __del__(self):
         if hasattr(self, "_filter"):
             cast_p1 = self._ffi.cast("void*", self._filter.b)
