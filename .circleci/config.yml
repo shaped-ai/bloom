@@ -39,6 +39,7 @@ jobs:
       - checkout
       - run:
           name: Running tests
+          context: bloom-test
           command: |
             curl "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh" --output miniconda.sh
             bash miniconda.sh -b -p .venv
@@ -59,6 +60,7 @@ jobs:
       - checkout
       - run:
           name: Building, testing and uploading x86_64 packages
+          context: bloom-test
           command: |
             export DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
             docker image pull $DOCKER_IMAGE
