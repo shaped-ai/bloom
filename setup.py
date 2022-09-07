@@ -5,7 +5,7 @@ from setuptools import Extension, find_namespace_packages, setup
 with open("README.md") as f:
     long_description = f.read()
 
-version = "3.3.0"
+version = "main"
 circleci_build_number = os.getenv("CIRCLE_BUILD_NUM", "")
 if circleci_build_number != "":
     version = f"{version}.dev{circleci_build_number}"
