@@ -51,12 +51,11 @@ jobs:
             make python-tests
 
   test-build-and-upload-library:
-    resource_class: small
-    docker:
-      - image: cimg/go:1.19
+    resource_class: medium
+    machine:
+      image: ubuntu-2004:202104-01
     parallelism: 1
     steps:
-      - setup_remote_docker
       - checkout
       - run:
           name: Building, testing and uploading x86_64 packages
@@ -71,9 +70,9 @@ jobs:
               $DOCKER_IMAGE /io/.circleci/build-wheels.sh
   
   prod-build-and-upload-library:
-    resource_class: small
-    docker:
-      - image: cimg/go:1.19
+    resource_class: medium
+    machine:
+      image: ubuntu-2004:202104-01
     parallelism: 1
     steps:
       - setup_remote_docker
@@ -105,6 +104,8 @@ workflows:
               only:
                 - /^v[0-9]+\.[0-9]+\.[0-9]+$/
       - test-build-and-upload-library:
+          context:
+            - bloom-test
           requires:
             - test-go-bloom-filter
             - linting-python-bloom-bindings
@@ -114,6 +115,8 @@ workflows:
               only:
                 - /^v[0-9]+\.[0-9]+\.[0-9]+$/
       - prod-build-and-upload-library:
+          context:
+            - bloom-test
           requires:
             - test-build-and-upload-library
             - build-and-deploy-approval
