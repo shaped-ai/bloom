@@ -7,9 +7,26 @@ Bloom filters
 
 This implementation of the Bloom filter is ported from the https://github.com/bits-and-blooms/bloom ([![Test](https://github.com/bits-and-blooms/bloom/actions/workflows/test.yml/badge.svg)](https://github.com/bits-and-blooms/bloom/actions/workflows/test.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bits-and-blooms/bloom)](https://goreportcard.com/report/github.com/bits-and-blooms/bloom)
-[![Go Reference](https://pkg.go.dev/badge/github.com/bits-and-blooms/bloom.svg)](https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3)) project. The reason for porting this project from Go is due to the fact that there are no high-performance implementations of the Bloom filter in Python. All Bloom filter packages we found on PyPi are written in pure Python and are just too slow for our real-time inference pipeline. We measured this implementation to be 60x faster than what we have gotten with the other libraries.
+[![Go Reference](https://pkg.go.dev/badge/github.com/bits-and-blooms/bloom.svg)](https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3)) project. The reason for porting this project from Go is due to the fact that there are no high-performance implementations of the Bloom filter in Python. All Bloom filter packages we found on PyPi are just too slow for our real-time inference pipeline.
 
-The Godoc documentation of the ported library can be found here: https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3 
+The Godoc documentation of the ported library can be found here: https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3
+
+## Benchmark
+
+The following PyPi libraries have been benchmarked on a filter configuration of 1 mil elements and an error rate of 1%. The following shows the time needed to evaluate all elements. These are the results of running the benchmark on an Apple M1 chip. The clear winner is this library.
+
+```text
+           shaped-bloom-filter  bloom-filter2  fastbloom-rs  easy-bloom-filter
+count               100.000000     100.000000    100.000000         100.000000
+mean (ms)            62.859311    2508.295782    464.162710        2201.442912
+std (ms)              2.300990      25.811489      6.834798          19.279795
+min (ms)             61.051130    2488.384008    457.671881        2177.664995
+25% (ms)             61.701119    2496.009886    459.175646        2190.251410
+50% (ms)             62.229514    2502.063990    462.151527        2196.185470
+75% (ms)             63.203335    2506.640196    466.094494        2205.390155
+max (ms)             76.441765    2666.959047    485.892057        2307.396173
+speedup               1.000000      39.903329      7.384152          35.021747
+```
 
 ## Description
 
