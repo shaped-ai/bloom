@@ -85,7 +85,6 @@ jobs:
               -e TWINE_REGISTRY_URL=https://upload.pypi.org/legacy/ \
               -e TWINE_USERNAME=$TWINE_USERNAME_PROD \
               -e TWINE_PASSWORD=$TWINE_PASSWORD_PROD \
-              -e CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
               $DOCKER_IMAGE /io/.circleci/build-wheels.sh
 
 workflows:
