@@ -1,8 +1,17 @@
 Bloom filters
 -------------
-[![Test](https://github.com/bits-and-blooms/bloom/actions/workflows/test.yml/badge.svg)](https://github.com/bits-and-blooms/bloom/actions/workflows/test.yml)
+[![PyPI version](https://badge.fury.io/py/shaped-bloom-filter.svg)](https://badge.fury.io/py/shaped-bloom-filter)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/shaped-ai/bloom/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/shaped-ai/bloom/tree/master)
+
+## Source project & considerations
+
+This implementation of the Bloom filter is ported from the https://github.com/bits-and-blooms/bloom ([![Test](https://github.com/bits-and-blooms/bloom/actions/workflows/test.yml/badge.svg)](https://github.com/bits-and-blooms/bloom/actions/workflows/test.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bits-and-blooms/bloom)](https://goreportcard.com/report/github.com/bits-and-blooms/bloom)
-[![Go Reference](https://pkg.go.dev/badge/github.com/bits-and-blooms/bloom.svg)](https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3)
+[![Go Reference](https://pkg.go.dev/badge/github.com/bits-and-blooms/bloom.svg)](https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3)) project. The reason for porting this project from Go is due to the fact that there are no high-performance implementations of the Bloom filter in Python. All Bloom filter packages we found on PyPi are written in pure Python and are just too slow for our real-time inference pipeline. We measured this implementation to be 60x faster than what we have gotten with the other libraries.
+
+The Godoc documentation of the ported library can be found here: https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3 
+
+## Description
 
 A Bloom filter is a concise/compressed representation of a set, where the main
 requirement is to make membership queries; _i.e._, whether an item is a
@@ -17,74 +26,183 @@ capacity, the more memory you will use.
 You may construct the Bloom filter capable of receiving 1 million elements with a false-positive
 rate of 1% in the following manner. 
 
-```Go
-    filter := bloom.NewWithEstimates(1000000, 0.01) 
+```python
+from shaped_bloom_filter import BloomFilter
+filter = BloomFilter(1000000, 0.01)
 ```
 
-You should call `NewWithEstimates` conservatively: if you specify a number of elements that it is
+Operations like the following can be done:
+
+```python
+# single member addition
+assert filter.is_member(10) == False
+filter.add(10)
+assert filter.is_member(10) == True
+
+# multiple member addition
+assert filter.are_members([1, 5, 9]) == [0, 0, 0]
+filter.add_batch([5, 9])
+assert filter.are_members([1, 5, 9]) == [0, 1, 1]
+
+# serialization
+serialized = filter.serialize()
+new_filter = BloomFilter(restore_from_serialized=serialized)
+assert new_filter.are_members([1, 5, 9]) == [0, 1, 1]
+```
+
+For composing your own keys using Python-serializable objects, you can use the following method:
+
+```python
+from shaped_bloom_filter import BloomFilterExtended
+filter = BloomFilterExtended(1000000, 0.01)
+
+assert filter.is_one_member("Emma is writing a letter.".encode("utf-8")) == False
+filter.add_one_member("Emma is writing a letter.".encode("utf-8"))
+assert filter.is_one_member("Emma is writing a letter.".encode("utf-8")) == True
+```
+
+You should call the `BloomFilter`/`BloomFilterExtended` constructors conservatively: if you specify a number of elements that it is
 too small, the false-positive bound might be exceeded. A Bloom filter is not a dynamic data structure:
 you must know ahead of time what your desired capacity is.
-
-Our implementation accepts keys for setting and testing as `[]byte`. Thus, to
-add a string item, `"Love"`:
-
-```Go
-    filter.Add([]byte("Love"))
-```
-
-Similarly, to test if `"Love"` is in bloom:
-
-```Go
-    if filter.Test([]byte("Love"))
-```
-
-For numerical data, we recommend that you look into the encoding/binary library. But, for example, to add a `uint32` to the filter:
-
-```Go
-    i := uint32(100)
-    n1 := make([]byte, 4)
-    binary.BigEndian.PutUint32(n1, i)
-    filter.Add(n1)
-```
-
-Godoc documentation:  https://pkg.go.dev/github.com/bits-and-blooms/bloom/v3 
 
 ## Installation
 
 ```bash
-go get -u github.com/bits-and-blooms/bloom/v3
+pip install shaped-bloom-filter
 ```
 
-## Verifying the False Positive Rate
+***Note: On MacOS/Windows machines, you also need Go as the Python package will be built from source.***
+
+## Reference
+
+<!-- markdownlint-disable -->
+
+<a href="python/shaped_bloom_filter/filter.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>module</kbd> `filter.py`
+
+---
+
+#### <kbd>class</kbd> `BloomFilter`
 
 
-Sometimes, the actual false positive rate may differ (slightly) from the
-theoretical false positive rate. We have a function to estimate the false positive rate of a
-Bloom filter with _m_ bits and _k_ hashing functions for a set of size _n_:
+<a href="python/shaped_bloom_filter/filter.py#L12"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
-```Go
-    if bloom.EstimateFalsePositiveRate(20*n, 5, n) > 0.001 ...
+##### <kbd>function</kbd> `__init__`
+
+```python
+__init__(
+    max_elements: Optional[int] = None,
+    error_rate: Optional[float] = None,
+    restore_from_serialized: bytes = None
+)
 ```
 
-You can use it to validate the computed m, k parameters:
+---
 
-```Go
-    m, k := bloom.EstimateParameters(n, fp)
-    ActualfpRate := bloom.EstimateFalsePositiveRate(m, k, n)
+<a href="python/shaped_bloom_filter/filter.py#L50"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+##### <kbd>function</kbd> `add`
+
+```python
+add(var: int)
 ```
 
-or
+Add a single 32-bit integer key to the filter. 
 
-```Go
-    f := bloom.NewWithEstimates(n, fp)
-    ActualfpRate := bloom.EstimateFalsePositiveRate(f.m, f.k, n)
+---
+
+<a href="python/shaped_bloom_filter/filter.py#L56"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+##### <kbd>function</kbd> `add_batch`
+
+```python
+add_batch(var: List[int])
 ```
 
-You would expect `ActualfpRate` to be close to the desired false-positive rate `fp` in these cases.
+Add a list of 32-bit integer keys to the filter. 
 
-The `EstimateFalsePositiveRate` function creates a temporary Bloom filter. It is
-also relatively expensive and only meant for validation.
+---
 
+<a href="python/shaped_bloom_filter/filter.py#L80"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+##### <kbd>function</kbd> `are_members`
+
+```python
+are_members(var: List[int]) → List[bool]
+```
+
+Check if a given list of 32-bit integer keys have been set. A boolean list is returned. 
+
+---
+
+<a href="python/shaped_bloom_filter/filter.py#L74"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+##### <kbd>function</kbd> `is_member`
+
+```python
+is_member(var: int) → bool
+```
+
+Check if a given 32-bit integer key has been set. 
+
+---
+
+<a href="python/shaped_bloom_filter/filter.py#L104"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+##### <kbd>function</kbd> `serialize`
+
+```python
+serialize() → bytes
+```
+
+Serialize the filter for storing purposes. To restore it, pass the returned bytes into the constructor's restore_from_serialized parameter. 
+
+
+---
+
+<a href="python/shaped_bloom_filter/filter.py#L117"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+##### <kbd>function</kbd> `__contains__`
+
+```python
+__contains__(var: int) → bool
+```
+
+Check if a given 32-bit integer key has been set.
+
+
+---
+
+#### <kbd>class</kbd> `BloomFilterExtended(BloomFilter)`
+
+
+<a href="python/shaped_bloom_filter/filter.py#L154"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+
+##### <kbd>function</kbd> `add_one_member`
+
+```python
+add_one_member(var: Union[List[int], int, bytes])
+```
+
+Add a single key to the filter. Examples of keys: serialized Python objects, strings, 64-digit integers, etc. 
+
+---
+
+<a href="python/shaped_bloom_filter/filter.py#L170"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+##### <kbd>function</kbd> `is_one_member`
+
+```python
+is_one_member(var: Union[List[int], int, bytes]) → bool
+```
+
+Check if a single key has been set. Examples of keys: serialized Python objects, strings, 64-digit integers, etc. 
+
+---
+
+_This file was automatically generated via [lazydocs](https://github.com/ml-tooling/lazydocs)._
 
 ## Contributing
 
@@ -100,8 +218,10 @@ make help
 
 Before committing the code, please check if it passes all tests using (note: this will install some dependencies):
 ```bash
-make deps
-make qa
+make python-environment
+make python-build
+make python-install
+make python-tests
 ```
 
 ## Design

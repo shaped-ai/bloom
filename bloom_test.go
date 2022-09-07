@@ -176,20 +176,28 @@ func testEstimated(n uint, maxFp float64, t *testing.T) {
 	fpRate := EstimateFalsePositiveRate(m, k, n)
 	if fpRate > 1.5*maxFp {
 		t.Errorf("False positive rate too high: n: %v; m: %v; k: %v; maxFp: %f; fpRate: %f, fpRate/maxFp: %f", n, m, k, maxFp, fpRate, fpRate/maxFp)
+	} else {
+		t.Logf("Accepted positive rate: maxFp: %f; fpRate: %f, fpRate/maxFp: %f", maxFp, fpRate, fpRate/maxFp)
 	}
 }
 
-func TestEstimated1000_0001(t *testing.T)   { testEstimated(1000, 0.000100, t) }
-func TestEstimated10000_0001(t *testing.T)  { testEstimated(10000, 0.000100, t) }
-func TestEstimated100000_0001(t *testing.T) { testEstimated(100000, 0.000100, t) }
+func TestEstimated1000_0001(t *testing.T)     { testEstimated(1000, 0.000100, t) }
+func TestEstimated10000_0001(t *testing.T)    { testEstimated(10000, 0.000100, t) }
+func TestEstimated100000_0001(t *testing.T)   { testEstimated(100000, 0.000100, t) }
+func TestEstimated1000000_0001(t *testing.T)  { testEstimated(1000000, 0.000100, t) }
+func TestEstimated10000000_0001(t *testing.T) { testEstimated(10000000, 0.000100, t) }
 
-func TestEstimated1000_001(t *testing.T)   { testEstimated(1000, 0.001000, t) }
-func TestEstimated10000_001(t *testing.T)  { testEstimated(10000, 0.001000, t) }
-func TestEstimated100000_001(t *testing.T) { testEstimated(100000, 0.001000, t) }
+func TestEstimated1000_001(t *testing.T)     { testEstimated(1000, 0.001000, t) }
+func TestEstimated10000_001(t *testing.T)    { testEstimated(10000, 0.001000, t) }
+func TestEstimated100000_001(t *testing.T)   { testEstimated(100000, 0.001000, t) }
+func TestEstimated1000000_001(t *testing.T)  { testEstimated(1000000, 0.001000, t) }
+func TestEstimated10000000_001(t *testing.T) { testEstimated(10000000, 0.001000, t) }
 
-func TestEstimated1000_01(t *testing.T)   { testEstimated(1000, 0.010000, t) }
-func TestEstimated10000_01(t *testing.T)  { testEstimated(10000, 0.010000, t) }
-func TestEstimated100000_01(t *testing.T) { testEstimated(100000, 0.010000, t) }
+func TestEstimated1000_01(t *testing.T)     { testEstimated(1000, 0.010000, t) }
+func TestEstimated10000_01(t *testing.T)    { testEstimated(10000, 0.010000, t) }
+func TestEstimated100000_01(t *testing.T)   { testEstimated(100000, 0.010000, t) }
+func TestEstimated1000000_01(t *testing.T)  { testEstimated(1000000, 0.010000, t) }
+func TestEstimated10000000_01(t *testing.T) { testEstimated(10000000, 0.010000, t) }
 
 func min(a, b uint) uint {
 	if a < b {

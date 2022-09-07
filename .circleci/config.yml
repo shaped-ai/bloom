@@ -1,0 +1,123 @@
+version: 2.1
+jobs:
+  test-go-bloom-filter:
+    resource_class: small
+    docker:
+      - image: cimg/go:1.19
+    parallelism: 1
+    steps:
+      - checkout
+      - run:
+          name: Running tests
+          command: |
+            go test -v ./...
+
+  linting-python-bloom-bindings:
+    resource_class: small
+    docker:
+      - image: cimg/base:stable
+    parallelism: 1
+    steps:
+      - checkout
+      - run:
+          name: Linting
+          command: |
+            curl "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh" --output miniconda.sh
+            bash miniconda.sh -b -p .venv
+            rm miniconda.sh
+            source .venv/etc/profile.d/conda.sh
+
+            make python-environment
+            make python-lint-check
+
+  test-python-bloom-bindings:
+    resource_class: small
+    docker:
+      - image: cimg/go:1.19
+    parallelism: 1
+    steps:
+      - checkout
+      - run:
+          name: Running tests
+          command: |
+            curl "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh" --output miniconda.sh
+            bash miniconda.sh -b -p .venv
+            rm miniconda.sh
+            source .venv/etc/profile.d/conda.sh
+            
+            make python-environment
+            make python-build
+            make python-install
+            make python-tests
+
+  test-build-and-upload-library:
+    resource_class: small
+    docker:
+      - image: cimg/go:1.19
+    parallelism: 1
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Building, testing and uploading x86_64 packages
+          command: |
+            export DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
+            docker image pull $DOCKER_IMAGE
+            docker run --rm -v $(pwd):/io \
+              -e TWINE_REGISTRY_URL=https://test.pypi.org/legacy/ \
+              -e TWINE_USERNAME=$TWINE_USERNAME_TEST \
+              -e TWINE_PASSWORD=$TWINE_PASSWORD_TEST \
+              -e CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+              $DOCKER_IMAGE /io/.circleci/build-wheels.sh
+  
+  prod-build-and-upload-library:
+    resource_class: small
+    docker:
+      - image: cimg/go:1.19
+    parallelism: 1
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Building, testing and uploading x86_64 packages
+          command: |
+            export DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
+            docker image pull $DOCKER_IMAGE
+            docker run --rm -v $(pwd):/io \
+              -e TWINE_REGISTRY_URL=https://upload.pypi.org/legacy/ \
+              -e TWINE_USERNAME=$TWINE_USERNAME_PROD \
+              -e TWINE_PASSWORD=$TWINE_PASSWORD_PROD \
+              -e CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+              $DOCKER_IMAGE /io/.circleci/build-wheels.sh
+
+workflows:
+  main:
+    jobs:
+      - test-go-bloom-filter
+      - linting-python-bloom-bindings
+      - test-python-bloom-bindings
+      - build-and-deploy-approval:
+          type: approval
+          requires:
+            - test-build-and-upload-library
+          filters:
+            branches:
+              only:
+                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      - test-build-and-upload-library:
+          requires:
+            - test-go-bloom-filter
+            - linting-python-bloom-bindings
+            - test-python-bloom-bindings
+          filters:
+            branches:
+              only:
+                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      - prod-build-and-upload-library:
+          requires:
+            - test-build-and-upload-library
+            - build-and-deploy-approval
+          filters:
+            branches:
+              only:
+                - /^v[0-9]+\.[0-9]+\.[0-9]+$/
