@@ -75,7 +75,6 @@ jobs:
       image: ubuntu-2004:202104-01
     parallelism: 1
     steps:
-      - setup_remote_docker
       - checkout
       - run:
           name: Building, testing and uploading x86_64 packages
