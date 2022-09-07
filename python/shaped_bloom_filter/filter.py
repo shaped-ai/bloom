@@ -115,6 +115,9 @@ class BloomFilter:
         return pickle.dumps(serializable, protocol=pickle.HIGHEST_PROTOCOL)
 
     def __contains__(self, var: int) -> bool:
+        """
+        Check if a given 32-bit integer key has been set.
+        """
         return self.is_member(var)
 
     def __del__(self):
