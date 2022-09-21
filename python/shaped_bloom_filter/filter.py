@@ -23,29 +23,37 @@ class BloomFilter:
         if max_elements is not None and error_rate is not None:
             self._filter = self._libbloomf.NewWithEstimates(max_elements, error_rate)
         elif restore_from_serialized is not None:
-            deserialized = pickle.loads(restore_from_serialized)
-
-            m = deserialized["m"]
-            k = deserialized["k"]
-            b_length = deserialized["b_length"]
-            b = deserialized["b"]
-
-            data = self._ffi.new("GoUint8[]", list(b))
-            go_slice = self._ffi.new(
-                "GoSlice*",
-                {
-                    "data": self._ffi.cast("void*", data),
-                    "len": b_length,
-                    "cap": b_length,
-                },
-            )
-            self._filter = self._libbloomf.NewFromSerialized(
-                m, k, b_length, go_slice[0]
-            )
+            self.restore_from_serialized(restore_from_serialized)
         else:
             raise BloomFilterIncorrectConstructorValues(
                 "either set max_elements and error_rate or set restore_from_serialized params"
             )
+
+    def restore_from_serialized(self, data: bytes):
+        """
+        Restore a bloom filter into an existing context.
+        Computationally faster than creating a new filter from scratch. 
+        """
+        self.__del__()
+        deserialized = pickle.loads(data)
+
+        m = deserialized["m"]
+        k = deserialized["k"]
+        b_length = deserialized["b_length"]
+        b = deserialized["b"]
+
+        data = self._ffi.new("GoUint8[]", list(b))
+        go_slice = self._ffi.new(
+            "GoSlice*",
+            {
+                "data": self._ffi.cast("void*", data),
+                "len": b_length,
+                "cap": b_length,
+            },
+        )
+        self._filter = self._libbloomf.NewFromSerialized(
+            m, k, b_length, go_slice[0]
+        )
 
     def add(self, var: int):
         """
