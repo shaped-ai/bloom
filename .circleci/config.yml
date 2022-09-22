@@ -101,6 +101,7 @@ workflows:
             branches:
               only:
                 - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+                - /^v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
       - test-build-and-upload-library:
           context:
             - bloom-test
@@ -112,6 +113,7 @@ workflows:
             branches:
               only:
                 - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+                - /^v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
       - prod-build-and-upload-library:
           context:
             - bloom-test
@@ -122,3 +124,4 @@ workflows:
             branches:
               only:
                 - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+                - /^v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
