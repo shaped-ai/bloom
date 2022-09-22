@@ -178,7 +178,20 @@ Serialize the filter for storing purposes. To restore it, pass the returned byte
 
 ---
 
-<a href="python/shaped_bloom_filter/filter.py#L117"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L99"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+##### <kbd>function</kbd> `serialize`
+
+```python
+serialize() → bytes
+```
+
+Serialize the filter for storing purposes. To restore it, pass the returned bytes into the constructor's restore_from_serialized parameter. 
+
+
+---
+
+<a href="python/shaped_bloom_filter/filter.py#L125"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ##### <kbd>function</kbd> `__contains__`
 
@@ -194,7 +207,7 @@ Check if a given 32-bit integer key has been set.
 #### <kbd>class</kbd> `BloomFilterExtended(BloomFilter)`
 
 
-<a href="python/shaped_bloom_filter/filter.py#L154"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L162"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 
 ##### <kbd>function</kbd> `add_one_member`
@@ -207,7 +220,7 @@ Add a single key to the filter. Examples of keys: serialized Python objects, str
 
 ---
 
-<a href="python/shaped_bloom_filter/filter.py#L170"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L178"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ##### <kbd>function</kbd> `is_one_member`
 
