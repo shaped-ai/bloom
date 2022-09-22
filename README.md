@@ -117,7 +117,7 @@ __init__(
 
 ---
 
-<a href="python/shaped_bloom_filter/filter.py#L50"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L32"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ##### <kbd>function</kbd> `add`
 
@@ -129,7 +129,7 @@ Add a single 32-bit integer key to the filter.
 
 ---
 
-<a href="python/shaped_bloom_filter/filter.py#L56"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L38"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ##### <kbd>function</kbd> `add_batch`
 
@@ -141,7 +141,7 @@ Add a list of 32-bit integer keys to the filter.
 
 ---
 
-<a href="python/shaped_bloom_filter/filter.py#L80"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L62"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ##### <kbd>function</kbd> `are_members`
 
@@ -153,7 +153,7 @@ Check if a given list of 32-bit integer keys have been set. A boolean list is re
 
 ---
 
-<a href="python/shaped_bloom_filter/filter.py#L74"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L56"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ##### <kbd>function</kbd> `is_member`
 
@@ -165,7 +165,7 @@ Check if a given 32-bit integer key has been set.
 
 ---
 
-<a href="python/shaped_bloom_filter/filter.py#L104"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L86"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ##### <kbd>function</kbd> `serialize`
 
@@ -178,7 +178,20 @@ Serialize the filter for storing purposes. To restore it, pass the returned byte
 
 ---
 
-<a href="python/shaped_bloom_filter/filter.py#L117"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L99"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+##### <kbd>function</kbd> `load`
+
+```python
+load(serialized_bloom_filter: bytes)
+```
+
+Restore a serialized bloom filter into the existing context. Computationally faster than creating a new filter from scratch.
+
+
+---
+
+<a href="python/shaped_bloom_filter/filter.py#L123"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ##### <kbd>function</kbd> `__contains__`
 
@@ -194,7 +207,7 @@ Check if a given 32-bit integer key has been set.
 #### <kbd>class</kbd> `BloomFilterExtended(BloomFilter)`
 
 
-<a href="python/shaped_bloom_filter/filter.py#L154"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L160"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 
 ##### <kbd>function</kbd> `add_one_member`
@@ -207,7 +220,7 @@ Add a single key to the filter. Examples of keys: serialized Python objects, str
 
 ---
 
-<a href="python/shaped_bloom_filter/filter.py#L170"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="python/shaped_bloom_filter/filter.py#L176"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ##### <kbd>function</kbd> `is_one_member`
 
